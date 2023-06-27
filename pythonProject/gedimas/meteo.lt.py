@@ -14,12 +14,39 @@ soup = BeautifulSoup(response.content, 'html.parser')
 
 week_days = soup.find_all('span', class_='date')
 temperatures = soup.find_all('span', class_='big up-from-zero')
+seven_days = week_days[:7]
+temperatures_days = temperatures [:7]
+
+# print(temperatures)
+
 
 night_temp = [temperature.get_text() for temperature in temperatures[::2]]
 week_day = [day.get_text() for day in week_days]
 
-data = {'weekday': week_day, 'temperature': night_temp}
+temp_list = []
+for temperature in temperatures:
+        temp_text = temperature.get_text().replace('C','')
+        temp_values = int(temp_text[:-1])
+        temp_list.append(temp_values)
+
+#
+min_legth = min(len(week_day), len(temp_list))
+week_day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday']
+week_temp_orde = [0, 5, 10, 15, 20, 25, 30]
+# print(temperatures)
+
+
+reorder_weekdays = week_day [:min_legth]
+reorder_temperature = night_temp[:min_legth]
+
+
+data = {
+        'weekday': week_day,
+        'temperature': temp_list
+        }
+
 df = pd.DataFrame(data)
+
 df_sorted = df.sort_values(by='temperature')
 
 plt.bar(df_sorted['weekday'], df_sorted['temperature'])
@@ -27,3 +54,7 @@ plt.xlabel('Savaitės diena')
 plt.ylabel('Temperatūra')
 plt.title('Orų prognozė Vilniuje')
 plt.show()
+
+
+
+
